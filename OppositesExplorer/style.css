@@ -1,0 +1,250 @@
+:root {
+    --bg: #f8fafc;
+    --text: #1e293b;
+    --header: #ffffff;
+    --card: #ffffff;
+    --border: #e2e8f0;
+    --accent: #2563eb;
+    --success: #22c55e;
+    --error: #cbd5e1;
+}
+
+[data-theme="dark"] {
+    --bg: #0f172a;
+    --text: #f1f5f9;
+    --header: #1e293b;
+    --card: #1e293b;
+    --border: #334155;
+    --accent: #38bdf8;
+}
+
+body {
+    margin: 0;
+    font-family: 'Segoe UI', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    transition: all 0.3s ease;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 2rem;
+    background: var(--header);
+    border-bottom: 2px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.btn {
+    padding: 10px 20px;
+    border-radius: 12px;
+    border: 2px solid var(--border);
+    cursor: pointer;
+    font-weight: bold;
+    background: var(--card);
+    color: var(--text);
+    margin-left: 10px;
+}
+
+.btn-active {
+    background: var(--accent) !important;
+    color: white !important;
+    border-color: var(--accent) !important;
+}
+
+.quiz-bar {
+    background: var(--accent);
+    color: white;
+    padding: 1.5rem;
+    text-align: center;
+    border-bottom: 5px solid rgba(0, 0, 0, 0.1);
+}
+
+.quiz-prompt {
+    font-size: 1rem;
+    opacity: 0.9;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.quiz-target {
+    font-size: 3.5rem;
+    font-weight: 900;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+}
+
+.main-container {
+    padding: 2rem;
+}
+
+.grid {
+    display: grid;
+    gap: 20px;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+}
+
+.card {
+    background: var(--card);
+    border: 4px solid var(--border);
+    border-radius: 20px;
+    height: 180px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-transform: uppercase;
+    font-size: 2.2rem;
+    font-weight: 900;
+    transition: transform 0.2s;
+}
+
+.card.correct {
+    border-color: var(--success) !important;
+    color: var(--success);
+    pointer-events: none;
+}
+
+/* Kinetic Typography Animations */
+.ani-hot {
+    color: #ff4500;
+    animation: glow 1.5s infinite alternate;
+}
+
+.ani-cold {
+    color: #00ffff;
+    animation: shiver 0.2s infinite;
+}
+
+.ani-big {
+    transform: scale(1.3);
+}
+
+.ani-small {
+    transform: scale(0.6);
+}
+
+.ani-fast {
+    color: #ff4500;
+    text-shadow: 0 0 10px #ff4500, 0 0 20px #ff8c00;
+    animation: fire 0.5s infinite alternate, dash 0.3s infinite linear;
+}
+
+.ani-slow {
+    opacity: 0.6;
+    transform: scale(0.8);
+    transition: 2s;
+}
+
+.ani-heavy {
+    transform: translateY(15px);
+    text-shadow: 2px 5px 5px rgba(0, 0, 0, 0.3);
+}
+
+.ani-light {
+    animation: float 2s infinite ease-in-out;
+}
+
+.ani-up {
+    transform: translateY(-20px);
+    transition: 0.5s;
+}
+
+.ani-down {
+    transform: translateY(20px);
+    transition: 0.5s;
+}
+
+.ani-loud {
+    animation: vibrate 0.1s infinite;
+}
+
+.ani-quiet {
+    opacity: 0.3;
+    font-size: 1.5rem;
+}
+
+@keyframes fire {
+    0% {
+        transform: skewX(-5deg);
+    }
+
+    100% {
+        transform: skewX(5deg);
+    }
+}
+
+@keyframes glow {
+    from {
+        text-shadow: 0 0 5px #ff4500;
+    }
+
+    to {
+        text-shadow: 0 0 20px #ff8c00;
+    }
+}
+
+@keyframes shiver {
+
+    0%,
+    100% {
+        transform: translate(1px, 1px);
+    }
+
+    50% {
+        transform: translate(-1px, -1px);
+    }
+}
+
+@keyframes dash {
+    0% {
+        transform: translateX(-15px);
+    }
+
+    100% {
+        transform: translateX(15px);
+    }
+}
+
+@keyframes float {
+
+    0%,
+    100% {
+        transform: translateY(0px);
+    }
+
+    50% {
+        transform: translateY(-25px);
+    }
+}
+
+@keyframes vibrate {
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.1);
+    }
+}
+
+@keyframes shake {
+
+    0%,
+    100% {
+        transform: translateX(0);
+    }
+
+    25% {
+        transform: translateX(-15px);
+    }
+
+    75% {
+        transform: translateX(15px);
+    }
+}
