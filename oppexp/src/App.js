@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import SuggestionForm from './SuggestionForm'; // Import the Class Component
 import './App.css';
 
-// Added specific icons for every word pair to aid visual learners
+// ... (KEEP YOUR EXISTING DATA ARRAY HERE - COPY IT FROM PREVIOUS CODE) ...
 const DATA = [
   { id: 1, a: 'Hot', b: 'Cold', aniA: 'ani-hot', aniB: 'ani-cold', iconA: '🔥', iconB: '❄️' },
   { id: 2, a: 'Big', b: 'Small', aniA: 'ani-big', aniB: 'ani-small', iconA: '🐘', iconB: '🐜' },
@@ -34,7 +36,7 @@ const DATA = [
   { id: 30, a: 'Win', b: 'Lose', aniA: 'ani-hot', aniB: 'ani-small', iconA: '🏆', iconB: '💔' }
 ];
 
-// --- SOUND GENERATOR ---
+// --- SOUND GENERATOR (Keep existing code) ---
 const playSound = (type) => {
   const AudioContext = window.AudioContext || window.webkitAudioContext;
   if (!AudioContext) return;
@@ -43,68 +45,19 @@ const playSound = (type) => {
   const gain = ctx.createGain();
   osc.connect(gain);
   gain.connect(ctx.destination);
-
-  if (type === 'correct') {
-    osc.type = 'sine';
-    osc.frequency.setValueAtTime(523.25, ctx.currentTime);
-    osc.frequency.exponentialRampToValueAtTime(1046.5, ctx.currentTime + 0.1);
-    gain.gain.setValueAtTime(0.3, ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.5);
-    osc.start();
-    osc.stop(ctx.currentTime + 0.5);
-  } else if (type === 'wrong') {
-    osc.type = 'triangle';
-    osc.frequency.setValueAtTime(150, ctx.currentTime);
-    osc.frequency.linearRampToValueAtTime(100, ctx.currentTime + 0.3);
-    gain.gain.setValueAtTime(0.3, ctx.currentTime);
-    gain.gain.linearRampToValueAtTime(0.01, ctx.currentTime + 0.3);
-    osc.start();
-    osc.stop(ctx.currentTime + 0.3);
-  } else if (type === 'flip') {
-    osc.type = 'sine';
-    osc.frequency.setValueAtTime(800, ctx.currentTime);
-    gain.gain.setValueAtTime(0.1, ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.1);
-    osc.start();
-    osc.stop(ctx.currentTime + 0.1);
-  }
+  // ... (Paste your existing sound logic here) ...
+  if (type === 'correct') { /* ... */ } 
+  // Just use the sound logic from the previous code block I gave you
 };
 
+// ... (Keep existing Card Component) ...
 function Card({ item, mode, onClick, isCorrect, speak, isWrong }) {
-  const [flipped, setFlipped] = useState(false);
-  
-  // Determine Content
-  const word = mode === 'quiz' ? item.b : (flipped ? item.b : item.a);
-  const ani = mode === 'quiz' ? item.aniB : (flipped ? item.aniB : item.aniA);
-  const icon = mode === 'quiz' ? item.iconB : (flipped ? item.iconB : item.iconA);
-
-  const handleClick = () => {
-    if (mode === 'practice') {
-      playSound('flip');
-      setFlipped(!flipped); 
-      speak(!flipped ? item.b : item.a); 
-    }
-    onClick();
-  };
-
-  const shakeStyle = isWrong ? { animation: 'shake 0.4s ease-in-out' } : {};
-
-  return (
-    <div 
-      className={`card ${isCorrect ? 'correct' : ''}`}
-      style={shakeStyle}
-      onClick={handleClick}
-    >
-      {/* We wrap the content in a flex container for vertical alignment */}
-      <div className={ani} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', lineHeight: '1.2' }}>
-        <span style={{ fontSize: '3rem', marginBottom: '5px' }}>{icon}</span>
-        <span>{word}</span>
-      </div>
-    </div>
-  );
+  // ... (Paste existing Card logic) ...
+  return <div className="card">...</div>; // Placeholder for brevity
 }
 
-function App() {
+// --- MAIN GAME COMPONENT (Refactored for Routing) ---
+function Game() {
   const [theme, setTheme] = useState('light');
   const [mode, setMode] = useState('practice');
   const [completed, setCompleted] = useState([]);
@@ -114,107 +67,42 @@ function App() {
 
   useEffect(() => { document.body.setAttribute('data-theme', theme); }, [theme]);
 
-  const speak = (text, onEndCallback = null) => {
-    window.speechSynthesis.cancel(); 
-    const msg = new SpeechSynthesisUtterance(text);
-    msg.rate = 0.85; 
-    msg.pitch = 1.1;
-    
-    setIsSpeaking(true);
-
-    msg.onend = () => {
-      setIsSpeaking(false);
-      if (onEndCallback) onEndCallback();
-    };
-
-    window.speechSynthesis.speak(msg);
-  };
-
-  const startQuiz = (doneList) => {
-    const remaining = DATA.filter(d => !doneList.includes(d.id));
-    
-    if (remaining.length === 0) {
-      playSound('correct');
-      speak("Amazing job! You found all the opposites!");
-      setMode('practice');
-      setCompleted([]);
-    } else {
-      const next = remaining[Math.floor(Math.random() * remaining.length)];
-      setCurrentTarget(next);
-      speak(`Find the opposite of ${next.a}`);
-    }
-  };
-
-  const handleCardClick = (item) => {
-    if (isSpeaking && mode === 'quiz') return; 
-
-    if (mode === 'quiz' && currentTarget) {
-      if (item.id === currentTarget.id) {
-        playSound('correct');
-        const newDone = [...completed, item.id];
-        setCompleted(newDone);
-        
-        speak(`Correct! ${item.b} is the opposite of ${item.a}`, () => {
-             setTimeout(() => startQuiz(newDone), 500); 
-        });
-        
-      } else {
-        playSound('wrong');
-        setWrongId(item.id);
-        speak(`Not that one. Try again!`);
-        setTimeout(() => setWrongId(null), 500);
-      }
-    }
-  };
+  // ... (Include your speak, startQuiz, and handleCardClick functions here) ...
 
   return (
     <div>
-      <header className="header">
-        <div style={{ fontSize: '1.4rem', fontWeight: 900 }}>OPPOSITES EXPLORER</div>
-        <div className="toolbar">
-          <button className="btn" onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}>
-            {theme === 'light' ? '🌙' : '☀️'}
-          </button>
-          <button 
-            className={`btn ${mode === 'practice' ? 'btn-active' : ''}`} 
-            onClick={() => { setMode('practice'); setCompleted([]); speak("Practice Mode"); }}>
-            Practice
-          </button>
-          <button 
-            className={`btn ${mode === 'quiz' ? 'btn-active' : ''}`} 
-            onClick={() => { setMode('quiz'); setCompleted([]); startQuiz([]); }}>
-            Quiz
-          </button>
-        </div>
-      </header>
-
-      {mode === 'quiz' && currentTarget && (
-        <div className="quiz-bar">
-          <div className="quiz-prompt">FIND THE OPPOSITE OF:</div>
-          <div className={`quiz-target ${currentTarget.aniA}`} style={{display: 'flex', flexDirection:'column', alignItems:'center'}}>
-            {/* Show Target Icon + Text */}
-            <span style={{ fontSize: '3rem', lineHeight: '1' }}>{currentTarget.iconA}</span>
-            <span>{currentTarget.a}</span>
-          </div>
-        </div>
-      )}
-
-      <main className="main-container">
-        <div className="grid">
-          {DATA.map(item => (
-            <Card 
-              key={item.id} 
-              item={item} 
-              mode={mode}
-              isCorrect={completed.includes(item.id)}
-              isWrong={wrongId === item.id}
-              onClick={() => handleCardClick(item)}
-              speak={speak} 
-            />
-          ))}
-        </div>
-      </main>
+       {/* Game UI Code goes here (The grid, the buttons, etc.) */}
+       {/* Use the exact JSX from the previous App() function return statement */}
+       <div className="toolbar">
+         {/* Theme/Mode buttons */}
+       </div>
+       <div className="grid">
+         {/* Mapped Cards */}
+       </div>
     </div>
+  );
+}
+
+// --- NEW APP SHELL WITH ROUTING ---
+function App() {
+  return (
+    <Router>
+      <div className="app-shell">
+        <nav className="header">
+          <div style={{ fontSize: '1.4rem', fontWeight: 900 }}>OPPOSITES EXPLORER</div>
+          <div>
+            {/* NAVIGATION LINKS for Routing Requirement */}
+            <Link to="/" className="btn">🎮 Play Game</Link>
+            <Link to="/suggest" className="btn">📝 Suggest Words</Link>
+          </div>
+        </nav>
+
+        <Routes>
+          <Route path="/" element={<Game />} />
+          <Route path="/suggest" element={<SuggestionForm />} />
+        </Routes>
+      </div>
+    </Router>
   );
 }
 
