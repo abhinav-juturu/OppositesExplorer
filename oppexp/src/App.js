@@ -113,6 +113,7 @@ function Game({ mode, setMode }) {
   const [wrongId, setWrongId] = useState(null);
   const [isSpeaking, setIsSpeaking] = useState(false);
 
+  // Memoize speak function to avoid recreating every render
   const speak = (text, onEndCallback = null) => {
     window.speechSynthesis.cancel(); 
     const msg = new SpeechSynthesisUtterance(text);
@@ -142,7 +143,6 @@ function Game({ mode, setMode }) {
   };
 
   // When mode changes (via Nav bar), reset the game state
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     setCompleted([]);
     setCurrentTarget(null);
@@ -154,6 +154,7 @@ function Game({ mode, setMode }) {
     } else {
        speak("Practice Mode");
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mode]);
 
   const handleCardClick = (item) => {
