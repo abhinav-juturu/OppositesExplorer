@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import SuggestionForm from './SuggestionForm';
 import './App.css';
@@ -113,21 +113,7 @@ function Game({ mode, setMode }) {
   const [wrongId, setWrongId] = useState(null);
   const [isSpeaking, setIsSpeaking] = useState(false);
 
-  // When mode changes (via Nav bar), reset the game state
-  useEffect(() => {
-    setCompleted([]);
-    setCurrentTarget(null);
-    setWrongId(null);
-    
-    // If switching to quiz, start it. If practice, say it.
-    if (mode === 'quiz') {
-       setTimeout(() => startQuiz([]), 500);
-    } else {
-       speak("Practice Mode");
-    }
-  }, [mode]);
-
-  const speak = (text, onEndCallback = null) => {
+  const speak = useCallback((text, onEndCallback = null) => {
     window.speechSynthesis.cancel(); 
     const msg = new SpeechSynthesisUtterance(text);
     msg.rate = 0.85; 
@@ -138,9 +124,9 @@ function Game({ mode, setMode }) {
       if (onEndCallback) onEndCallback();
     };
     window.speechSynthesis.speak(msg);
-  };
+  }, []);
 
-  const startQuiz = (doneList) => {
+  const startQuiz = useCallback((doneList) => {
     const remaining = DATA.filter(d => !doneList.includes(d.id));
     
     if (remaining.length === 0) {
@@ -153,9 +139,23 @@ function Game({ mode, setMode }) {
       setCurrentTarget(next);
       speak(`Find the opposite of ${next.a}`);
     }
-  };
+  }, [speak, setMode, setCurrentTarget, setCompleted]);
 
-  const handleCardClick = (item) => {
+  // When mode changes (via Nav bar), reset the game state
+  useEffect(() => {
+    setCompleted([]);
+    setCurrentTarget(null);
+    setWrongId(null);
+    
+    // If switching to quiz, start it. If practice, say it.
+    if (mode === 'quiz') {
+       setTimeout(() => startQuiz([]), 500);
+    } else {
+       speak("Practice Mode");
+    }
+  }, [mode, startQuiz, speak]);
+
+  const handleCardClick = useCallback((item) => {
     if (isSpeaking && mode === 'quiz') return; 
 
     if (mode === 'quiz' && currentTarget) {
@@ -173,7 +173,7 @@ function Game({ mode, setMode }) {
         setTimeout(() => setWrongId(null), 500);
       }
     }
-  };
+  }, [isSpeaking, mode, currentTarget, completed, speak, startQuiz]);
 
   return (
     <div>
