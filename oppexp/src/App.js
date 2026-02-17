@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import SuggestionForm from './SuggestionForm';
 import './App.css';
@@ -113,7 +113,7 @@ function Game({ mode, setMode }) {
   const [wrongId, setWrongId] = useState(null);
   const [isSpeaking, setIsSpeaking] = useState(false);
 
-  const speak = useCallback((text, onEndCallback = null) => {
+  const speak = (text, onEndCallback = null) => {
     window.speechSynthesis.cancel(); 
     const msg = new SpeechSynthesisUtterance(text);
     msg.rate = 0.85; 
@@ -124,9 +124,9 @@ function Game({ mode, setMode }) {
       if (onEndCallback) onEndCallback();
     };
     window.speechSynthesis.speak(msg);
-  }, []);
+  };
 
-  const startQuiz = useCallback((doneList) => {
+  const startQuiz = (doneList) => {
     const remaining = DATA.filter(d => !doneList.includes(d.id));
     
     if (remaining.length === 0) {
@@ -139,7 +139,7 @@ function Game({ mode, setMode }) {
       setCurrentTarget(next);
       speak(`Find the opposite of ${next.a}`);
     }
-  }, [speak, setMode, setCurrentTarget, setCompleted]);
+  };
 
   // When mode changes (via Nav bar), reset the game state
   useEffect(() => {
@@ -153,9 +153,10 @@ function Game({ mode, setMode }) {
     } else {
        speak("Practice Mode");
     }
-  }, [mode, startQuiz, speak]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mode]);
 
-  const handleCardClick = useCallback((item) => {
+  const handleCardClick = (item) => {
     if (isSpeaking && mode === 'quiz') return; 
 
     if (mode === 'quiz' && currentTarget) {
@@ -173,7 +174,7 @@ function Game({ mode, setMode }) {
         setTimeout(() => setWrongId(null), 500);
       }
     }
-  }, [isSpeaking, mode, currentTarget, completed, speak, startQuiz]);
+  };
 
   return (
     <div>
