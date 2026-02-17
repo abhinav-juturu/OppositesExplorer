@@ -142,6 +142,7 @@ function Game({ mode, setMode }) {
   };
 
   // When mode changes (via Nav bar), reset the game state
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     setCompleted([]);
     setCurrentTarget(null);
@@ -153,7 +154,6 @@ function Game({ mode, setMode }) {
     } else {
        speak("Practice Mode");
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mode]);
 
   const handleCardClick = (item) => {
